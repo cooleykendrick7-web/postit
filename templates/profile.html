@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.world_title or profile.name }} — Post It{% endblock %}
+{% block content %}
+<div class="cover {{ 'verified-glow' if profile.verified }}">
+  {% if profile.cover %}<img src="{{ profile.cover }}" alt="Cover photo">{% endif %}
+</div>
+
+<div class="profile-head">
+  <span class="avatar avatar-lg">
+    {% if profile.avatar %}<img src="{{ profile.avatar }}" alt="{{ profile.name }}'s avatar">
+    {% else %}<span class="initial">{{ profile.name[0] }}</span>{% endif %}
+  </span>
+  <h1 class="profile-title">{{ profile.world_title or profile.name }}{% if profile.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</h1>
+  <div class="profile-name">{{ profile.name }} · 👥 {{ profile.friend_count }} friends</div>
+</div>
+
+{# ---- friend / block actions ---- #}
+{% if not profile.is_owner %}
+<div class="friend-actions">
+  {% if profile.blocked_by_me %}
+    <form action="/unblock/{{ profile.id }}" method="POST">
+      <button type="submit" class="btn-ghost">Unblock</button>
+    </form>
+  {% else %}
+    {% if profile.req_status == 'none' %}
+      <form action="/friends/request/{{ profile.id }}" method="POST">
+        <button type="submit">➕ Add friend</button>
+      </form>
+    {% elif profile.req_status == 'pending_out' %}
+      <button type="button" class="btn-ghost" disabled>⏳ Request pending</button>
+    {% elif profile.req_status == 'pending_in' %}
+      <form action="/friends/accept/{{ profile.id }}" method="POST">
+        <button type="submit">✅ Accept</button>
+      </form>
+      <form action="/friends/decline/{{ profile.id }}" method="POST">
+        <button type="submit" class="btn-danger">✖️ Decline</button>
+      </form>
+    {% elif profile.req_status == 'friends' %}
+      <button type="button" class="btn-ghost" disabled>✅ Friends</button>
+      <form action="/friends/remove/{{ profile.id }}" method="POST" onsubmit="return confirm('Remove {{ profile.name }} as a friend?');">
+        <button type="submit" class="btn-danger">Remove friend</button>
+      </form>
+    {% endif %}
+    <a class="btn btn-ghost" href="/inbox/{{ profile.id }}">💬 Message</a>
+    <form action="/block/{{ profile.id }}" method="POST" onsubmit="return confirm('Block {{ profile.name }}?');">
+      <button type="submit" class="btn-danger">🚫 Block</button>
+    </form>
+  {% endif %}
+</div>
+{% else %}
+<div class="friend-actions">
+  <a class="btn btn-ghost" href="/settings/profile">✏️ Edit my world</a>
+</div>
+{% endif %}
+
+{# ---- info ---- #}
+<div class="profile-card {{ 'verified-glow' if profile.verified }}">
+  {% if profile.bio %}<p class="bio">{{ profile.bio }}</p>{% endif %}
+  <div class="info-grid">
+    <div class="info-item"><div class="k">Name</div><div class="v">{{ profile.name }}</div></div>
+    {% if profile.birthday %}<div class="info-item"><div class="k">Birthday</div><div class="v">{{ profile.birthday }}</div></div>{% endif %}
+    {% if profile.hometown %}<div class="info-item"><div class="k">Hometown</div><div class="v">{{ profile.hometown }}</div></div>{% endif %}
+    {% if profile.city %}<div class="info-item"><div class="k">City</div><div class="v">{{ profile.city }}</div></div>{% endif %}
+    {% if profile.workplace %}<div class="info-item"><div class="k">Workplace</div><div class="v">{{ profile.workplace }}</div></div>{% endif %}
+    {% if profile.job_title %}<div class="info-item"><div class="k">Job title</div><div class="v">{{ profile.job_title }}</div></div>{% endif %}
+  </div>
+</div>
+
+{# ---- wall ---- #}
+<h2 class="page-title">📌 Wall</h2>
+<div class="notes">
+  {% for post in posts %}
+    {% include "partials/post_card.html" %}
+  {% else %}
+  <div class="empty-state">
+    <span class="big">📌</span>
+    No posts yet — stick the first note!
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

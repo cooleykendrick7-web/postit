@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ listing.title }} — Post It Market{% endblock %}
+{% block content %}
+<p><a href="/market">← Back to Market</a></p>
+
+<div class="card">
+  <h1 class="page-title">{{ listing.title }}</h1>
+  <span class="status-pill status-{{ listing.status }}">{{ listing.status }}</span>
+  <div class="listing-price" style="font-size:1.6rem;margin:.4rem 0">${{ listing.price }}</div>
+  <p class="muted">{{ listing.category }}{% if listing.meetup_city %} · 📍 {{ listing.meetup_city }}{% endif %}{% if listing.shipping %} · 📦 Ships{% endif %}</p>
+
+  {% if listing.photos %}
+  <div class="photo-strip">
+    {% for p in listing.photos %}<img src="{{ p }}" alt="Listing photo {{ loop.index }}">{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if listing.description %}<p style="white-space:pre-wrap">{{ listing.description }}</p>{% endif %}
+  <p class="muted">Listed {{ listing.created_at | fancy_time }}</p>
+
+  <div class="user-row">
+    <a class="avatar avatar-md" href="/world/{{ listing.seller.id }}">
+      {% if listing.seller.avatar %}<img src="{{ listing.seller.avatar }}" alt="{{ listing.seller.name }}">
+      {% else %}<span class="initial">{{ listing.seller.name[0] }}</span>{% endif %}
+    </a>
+    <div class="grow">
+      <div class="nm"><a href="/world/{{ listing.seller.id }}" style="color:#fff">{{ listing.seller.name }}</a>{% if listing.seller.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+      <div class="sub">⭐ {{ avg_rating }}/5 ({{ rating_count }} ratings)</div>
+    </div>
+  </div>
+</div>
+
+{# ---- owner controls ---- #}
+{% if is_owner %}
+<div class="card">
+  <h2>🛠 Manage listing</h2>
+  <form class="toolbar" action="/market/{{ listing.id }}/status" method="POST">
+    <select name="status" style="width:auto;flex:1;min-width:140px">
+      <option value="active" {{ 'selected' if listing.status == 'active' }}>Active</option>
+      <option value="pending" {{ 'selected' if listing.status == 'pending' }}>Pending</option>
+      <option value="sold" {{ 'selected' if listing.status == 'sold' }}>Sold</option>
+    </select>
+    <button type="submit">Update status</button>
+  </form>
+  <form action="/market/{{ listing.id }}/delete" method="POST" onsubmit="return confirm('Delete this listing for good?');">
+    <button type="submit" class="btn-danger">🗑 Delete listing</button>
+  </form>
+
+  <h2>💰 Offers</h2>
+  {% for o in offers %}
+  <div class="offer">
+    <strong>${{ o.amount }}</strong> — {{ o.buyer_name }}{% if o.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}
+    {% if o.message %}<p class="muted" style="margin:.3rem 0">{{ o.message }}</p>{% endif %}
+    <span class="muted">{{ o.created_at | fancy_time }}</span>
+  </div>
+  {% else %}
+  <p class="muted">No offers yet.</p>
+  {% endfor %}
+</div>
+{% else %}
+{# ---- buyer actions ---- #}
+<div class="card">
+  <h2>💰 Make an offer</h2>
+  <form action="/market/{{ listing.id }}/offer" method="POST">
+    <div class="field">
+      <label for="amount">Your offer ($)</label>
+      <input type="number" id="amount" name="amount" min="0" step="0.01" required placeholder="20.00">
+    </div>
+    <div class="field">
+      <label for="message">Message to seller (optional)</label>
+      <input type="text" id="message" name="message" maxlength="300" placeholder="I can pick up this weekend…">
+    </div>
+    <button type="submit">Send offer 💸</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>⭐ Rate this seller</h2>
+  <form action="/market/seller/{{ listing.seller.id }}/rate" method="POST">
+    <div class="field">
+      <label for="stars">Stars</label>
+      <select id="stars" name="stars">
+        <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+        <option value="4">⭐⭐⭐⭐ (4)</option>
+        <option value="3">⭐⭐⭐ (3)</option>
+        <option value="2">⭐⭐ (2)</option>
+        <option value="1">⭐ (1)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="comment">Comment (optional)</label>
+      <input type="text" id="comment" name="comment" maxlength="300" placeholder="Fast shipper, great seller!">
+    </div>
+    <button type="submit">Rate seller</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

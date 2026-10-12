@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Edit my world — Post It{% endblock %}
+{% block content %}
+<h1 class="page-title">⚙️ Edit my world</h1>
+<form class="card" action="/settings/profile" method="POST" enctype="multipart/form-data">
+  <div class="field">
+    <label for="world_title">My Post It world (page title)</label>
+    <input type="text" id="world_title" name="world_title" value="{{ profile.world_title or '' }}" maxlength="80" placeholder="e.g. Ken's Corner of Chaos">
+  </div>
+  <div class="field">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" value="{{ profile.name or '' }}" required maxlength="80">
+  </div>
+  <div class="field">
+    <label for="bio">Bio</label>
+    <textarea id="bio" name="bio" placeholder="Tell the world who you are…">{{ profile.bio or '' }}</textarea>
+  </div>
+  <div class="field">
+    <label for="birthday">Birthday</label>
+    <input type="date" id="birthday" name="birthday" value="{{ profile.birthday or '' }}">
+  </div>
+  <div class="field">
+    <label for="hometown">Hometown</label>
+    <input type="text" id="hometown" name="hometown" value="{{ profile.hometown or '' }}" maxlength="80">
+  </div>
+  <div class="field">
+    <label for="city">City</label>
+    <input type="text" id="city" name="city" value="{{ profile.city or '' }}" maxlength="80">
+  </div>
+  <div class="field">
+    <label for="workplace">Workplace</label>
+    <input type="text" id="workplace" name="workplace" value="{{ profile.workplace or '' }}" maxlength="120">
+  </div>
+  <div class="field">
+    <label for="job_title">Job title</label>
+    <input type="text" id="job_title" name="job_title" value="{{ profile.job_title or '' }}" maxlength="120">
+  </div>
+  <div class="field">
+    <label for="avatar">Avatar photo</label>
+    {% if profile.avatar %}<img src="{{ profile.avatar }}" alt="Current avatar" style="width:64px;height:64px;border-radius:50%;margin-bottom:.4rem">{% endif %}
+    <input type="file" id="avatar" name="avatar" accept="image/*">
+  </div>
+  <div class="field">
+    <label for="cover">Cover photo</label>
+    {% if profile.cover %}<img src="{{ profile.cover }}" alt="Current cover" style="width:160px;border-radius:10px;margin-bottom:.4rem">{% endif %}
+    <input type="file" id="cover" name="cover" accept="image/*">
+  </div>
+  <button type="submit">Save changes 💾</button>
+  <a class="btn btn-ghost" href="/world/{{ profile.id }}">Cancel</a>
+</form>
+{% endblock %}

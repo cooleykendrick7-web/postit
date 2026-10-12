@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Home — Post It{% endblock %}
+{% block content %}
+
+{# ---- composer ---- #}
+<form class="composer" action="/posts" method="POST" enctype="multipart/form-data">
+  <h2 class="page-title" style="margin-top:0">📌 Stick a note</h2>
+  <textarea name="body" placeholder="What's on your mind? Stick it here…" required></textarea>
+  <div class="field">
+    <label for="media">Photo / video / audio (optional)</label>
+    <input type="file" id="media" name="media" accept="image/*,video/*,audio/*">
+  </div>
+  <fieldset class="colors" style="border:0;padding:0">
+    <span class="colors-label">Pick a sticky color:</span>
+    {% for c in ['#fff3a3','#ffb3d9','#ff8a8a','#1a1a1a','#a3d8ff','#b3ffb3','#d9b3ff','#ffd1a3'] %}
+    <label class="color-swatch" title="{{ c }}">
+      <input type="radio" name="color" value="{{ c }}" {{ 'checked' if loop.first }}>
+      <span class="dot" style="background:{{ c }}"></span>
+    </label>
+    {% endfor %}
+  </fieldset>
+  <div class="field">
+    <label for="privacy">Who can see this?</label>
+    <select id="privacy" name="privacy">
+      <option value="public">🌍 Public</option>
+      <option value="friends">👥 Friends only</option>
+      <option value="me">🔒 Only me</option>
+      <option value="custom">🎛 Custom…</option>
+    </select>
+  </div>
+  <div class="custom-fields" id="customFields" hidden>
+    <div class="field">
+      <label for="allow">Allow (user IDs, comma-separated)</label>
+      <input type="text" id="allow" name="allow" placeholder="e.g. 3, 7, 12">
+    </div>
+    <div class="field">
+      <label for="deny">Deny (user IDs, comma-separated)</label>
+      <input type="text" id="deny" name="deny" placeholder="e.g. 5">
+    </div>
+    <p class="hint">Custom privacy: list the user IDs who CAN see this note (allow) and who CANNOT (deny), separated by commas. You can find someone's user ID on their profile page.</p>
+  </div>
+  <button type="submit">Stick it! 📌</button>
+</form>
+
+{# ---- stories ---- #}
+{% include "partials/stories.html" %}
+<form class="story-upload card" action="/stories" method="POST" enctype="multipart/form-data">
+  <span class="muted">⚡ Add a story (vanishes in 24h):</span>
+  <input type="file" name="media" accept="image/*,video/*" required style="flex:1;min-width:140px">
+  <button type="submit" class="btn-small">Post story</button>
+</form>
+
+{# ---- feed ---- #}
+<h2 class="page-title">🗞 Your wall</h2>
+<div class="notes">
+  {% for post in posts %}
+    {% include "partials/post_card.html" %}
+  {% else %}
+  <div class="empty-state">
+    <span class="big">📌</span>
+    No posts yet — stick the first note!
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

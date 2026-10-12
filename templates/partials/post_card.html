@@ -1,0 +1,111 @@
+{# Sticky-note post card. Context: post (dict per contract). #}
+{% set _c = post.color if post.color and post.color|length == 7 else '#fff3a3' %}
+{% set _r = _c[1:3]|int(base=16) %}
+{% set _g = _c[3:5]|int(base=16) %}
+{% set _b = _c[5:7]|int(base=16) %}
+{% set _lum = 0.299*_r + 0.587*_g + 0.114*_b %}
+<article class="note {{ 'note-dark' if _lum < 140 else 'note-light' }}" style="--note:{{ _c }}" id="post-{{ post.id }}">
+  <span class="pin" aria-hidden="true"></span>
+
+  <header class="note-head">
+    <a class="avatar avatar-sm" href="/world/{{ post.user_id }}">
+      {% if post.author_avatar %}<img src="{{ post.author_avatar }}" alt="{{ post.author_name }}'s avatar">
+      {% else %}<span class="initial">{{ post.author_name[0] }}</span>{% endif %}
+    </a>
+    <div class="who">
+      <a href="/world/{{ post.user_id }}">{{ post.author_name }}</a>{% if post.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}
+      <div class="note-meta">{{ post.created_at | fancy_time }}{% if post.privacy %} · {{ post.privacy }}{% endif %}{% if post.world_title %} · {{ post.world_title }}{% endif %}</div>
+    </div>
+  </header>
+
+  {% if post.body %}
+  <p class="note-body">{{ post.body }}</p>
+  {% endif %}
+
+  {% if post.media %}
+  <div class="note-media">
+    {% if post.kind == 'photo' %}
+      <img src="{{ post.media }}" alt="Post photo">
+    {% elif post.kind == 'video' %}
+      <video src="{{ post.media }}" controls preload="metadata"></video>
+    {% elif post.kind == 'audio' %}
+      <audio src="{{ post.media }}" controls></audio>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if post.shared %}
+  <div class="shared-note">
+    <div class="muted">🔁 Shared from <strong>{{ post.shared.author_name }}</strong>{% if post.shared.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+    {% if post.shared.body %}<p>{{ post.shared.body }}</p>{% endif %}
+    {% if post.shared.media %}
+      {% if post.shared.kind == 'photo' %}
+        <img src="{{ post.shared.media }}" alt="Shared photo" style="border-radius:8px">
+      {% elif post.shared.kind == 'video' %}
+        <video src="{{ post.shared.media }}" controls preload="metadata" style="border-radius:8px;width:100%"></video>
+      {% elif post.shared.kind == 'audio' %}
+        <audio src="{{ post.shared.media }}" controls style="width:100%"></audio>
+      {% endif %}
+    {% endif %}
+    <a href="/post/{{ post.shared.id }}">View original</a>
+  </div>
+  {% endif %}
+
+  <div class="reactions" role="group" aria-label="Reactions">
+    {% for r in [('like','👍'),('love','❤️'),('laugh','😂'),('fire','🔥'),('skull','💀')] %}
+    <form class="react-form inline-form" action="/post/{{ post.id }}/react" method="POST">
+      <input type="hidden" name="kind" value="{{ r[0] }}">
+      <button type="submit" class="react-btn {{ 'mine' if post.my_reaction == r[0] }}" data-kind="{{ r[0] }}" title="{{ r[0] }}">
+        {{ r[1] }}<span class="cnt">{% if post.counts and post.counts[r[0]] %}{{ post.counts[r[0]] }}{% endif %}</span>
+      </button>
+    </form>
+    {% endfor %}
+  </div>
+
+  <div class="note-foot">
+    <a href="/post/{{ post.id }}">💬 {{ post.comments_count }} comment{{ 's' if post.comments_count != 1 }}</a>
+    <form class="inline-form" action="/post/{{ post.id }}/share" method="POST" title="Share to your world">
+      <button type="submit" class="btn-small">🔁 Share</button>
+    </form>
+    {% if post.can_edit %}
+      <button type="button" class="btn-small" data-edit-toggle="edit-{{ post.id }}">✏️ Edit</button>
+    {% endif %}
+    {% if post.can_delete %}
+      <form class="inline-form" action="/post/{{ post.id }}/delete" method="POST" onsubmit="return confirm('Unstick this note for good?');">
+        <button type="submit" class="btn-small">🗑 Delete</button>
+      </form>
+    {% endif %}
+    <details class="report-box">
+      <summary>⚠️ Report</summary>
+      <form action="/post/{{ post.id }}/report" method="POST">
+        <input type="text" name="reason" placeholder="Why is this bad?" required>
+        <button type="submit" class="btn-small">Send</button>
+      </form>
+    </details>
+  </div>
+
+  {% if post.can_edit %}
+  <div class="comment-form" id="edit-{{ post.id }}" hidden>
+    <form action="/post/{{ post.id }}/edit" method="POST" style="display:flex;gap:.4rem;width:100%">
+      <input type="text" name="body" value="{{ post.body }}" required>
+      <button type="submit" class="btn-small">Save</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if post.comments is defined and post.comments is not none %}
+  <div class="comments">
+    {% for c in post.comments %}
+    <div class="comment">
+      <div class="bubble"><strong>{{ c.author_name }}</strong>{% if c.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}: {{ c.body }}</div>
+    </div>
+    {% else %}
+    <p class="muted">No comments yet — drop the first one!</p>
+    {% endfor %}
+    <form class="comment-form" action="/post/{{ post.id }}/comment" method="POST">
+      <input type="text" name="body" placeholder="Write a comment…" required style="flex:1">
+      <button type="submit" class="btn-small">Post</button>
+    </form>
+  </div>
+  {% endif %}
+</article>

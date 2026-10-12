@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Market — Post It{% endblock %}
+{% block wrap_class %} wrap-wide{% endblock %}
+{% block content %}
+<h1 class="page-title">🛍 Post It Market</h1>
+
+<form class="filter-bar" action="/market" method="GET">
+  <input type="text" name="q" value="{{ q or '' }}" placeholder="Search listings…">
+  <select name="category">
+    <option value="">All categories</option>
+    {% for c in categories %}
+    <option value="{{ c }}" {{ 'selected' if cat == c }}>{{ c }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filter</button>
+  <a class="btn btn-ghost" href="/market/new">＋ Sell something</a>
+</form>
+
+<h2>🏷 Listings</h2>
+<div class="market-grid">
+  {% for l in listings %}
+  <a class="listing-card" href="/market/{{ l.id }}">
+    <span class="listing-thumb">
+      {% if l.photos and l.photos[0] %}<img src="{{ l.photos[0] }}" alt="{{ l.title }}">
+      {% else %}<span class="no-photo">📦</span>{% endif %}
+    </span>
+    <span class="listing-body">
+      <span class="listing-title">{{ l.title }}</span>
+      <span class="listing-price">${{ l.price }}</span>
+      <span class="listing-cat">{{ l.category }}{% if l.meetup_city %} · 📍 {{ l.meetup_city }}{% endif %}</span>
+    </span>
+  </a>
+  {% else %}
+  <div class="empty-state" style="grid-column:1/-1"><span class="big">🛍</span>Nothing for sale yet — be the first to list something!</div>
+  {% endfor %}
+</div>
+
+<h2>👥 Market groups <a class="btn btn-small btn-ghost" href="/market/groups/new">＋ New group</a></h2>
+{% for g in groups %}
+<div class="user-row">
+  <div class="grow">
+    <div class="nm"><a href="/market/groups/{{ g.id }}" style="color:#fff">{{ g.name }}</a></div>
+    <div class="sub">{{ g.member_count }} members · {{ g.description }}</div>
+  </div>
+  <a class="btn btn-small btn-ghost" href="/market/groups/{{ g.id }}">Open</a>
+</div>
+{% else %}
+<p class="muted">No groups yet — start one! 🎉</p>
+{% endfor %}
+
+<h2>🔎 ISO — In Search Of</h2>
+<div class="toolbar"><a class="btn btn-ghost" href="/market/iso/new">＋ Post an ISO</a></div>
+{% for iso in iso_posts %}
+<div class="offer">
+  <strong>{{ iso.title }}</strong>
+  <span class="listing-cat">{{ iso.category }}{% if iso.max_price %} · up to ${{ iso.max_price }}{% endif %}</span>
+  <p class="muted" style="margin:.3rem 0">{{ iso.description }}</p>
+  <span class="muted">by {{ iso.user_name }}{% if iso.verified %}<span class="verified-badge">🌙⭐</span>{% endif %} · {{ iso.created_at | fancy_time }}</span>
+</div>
+{% else %}
+<p class="muted">Nobody's hunting for anything right now. 🎯</p>
+{% endfor %}
+{% endblock %}

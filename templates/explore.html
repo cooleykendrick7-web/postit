@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Explore — Post It{% endblock %}
+{% block content %}
+<h1 class="page-title">🧭 Explore</h1>
+
+<h2>🌍 Cool worlds</h2>
+<div class="worlds-row">
+  {% for u in worlds %}
+  <div class="world-chip">
+    <a href="/world/{{ u.id }}">
+      <span class="avatar avatar-md">
+        {% if u.avatar %}<img src="{{ u.avatar }}" alt="{{ u.name }}">
+        {% else %}<span class="initial">{{ u.name[0] }}</span>{% endif %}
+      </span>
+      <div class="nm">{{ u.name }}{% if u.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+    </a>
+  </div>
+  {% else %}
+  <p class="muted">No worlds to show yet.</p>
+  {% endfor %}
+</div>
+
+<h2>📌 Public notes</h2>
+<div class="notes">
+  {% for post in posts %}
+    {% include "partials/post_card.html" %}
+  {% else %}
+  <div class="empty-state">
+    <span class="big">📌</span>
+    No posts yet — stick the first note!
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

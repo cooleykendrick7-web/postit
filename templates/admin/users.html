@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Admin users — Post It{% endblock %}
+{% block wrap_class %} admin-wrap{% endblock %}
+{% block content %}
+<h1 class="page-title">🛠 Users</h1>
+<div class="toolbar">
+  <a class="btn btn-ghost btn-small" href="/admin">Dashboard</a>
+  <a class="btn btn-ghost btn-small" href="/admin/users">Users</a>
+  <a class="btn btn-ghost btn-small" href="/admin/posts">Posts</a>
+  <a class="btn btn-ghost btn-small" href="/admin/reports">Reports</a>
+  <a class="btn btn-ghost btn-small" href="/admin/logout">Logout</a>
+</div>
+
+<form class="search-box" action="/admin/users" method="GET">
+  <input type="text" name="q" value="{{ q or '' }}" placeholder="Search users…" style="flex:1">
+  <button type="submit">Search</button>
+</form>
+
+<table class="admin-table">
+  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Verified</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.id }}</td>
+    <td>{{ u.name }}{% if u.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ '✅' if u.verified else '—' }}</td>
+    <td><a class="btn btn-small btn-ghost" href="/admin/user/{{ u.id }}">Inspect</a></td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" class="muted">No users found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

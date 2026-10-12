@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ story.user_name }}'s story — Post It{% endblock %}
+{% block content %}
+<div class="story-viewer">
+  <p>
+    <a class="avatar avatar-md" href="/world/{{ story.user_id }}">
+      {% if story.avatar %}<img src="{{ story.avatar }}" alt="{{ story.user_name }}">
+      {% else %}<span class="initial">{{ story.user_name[0] }}</span>{% endif %}
+    </a>
+  </p>
+  <h2><a href="/world/{{ story.user_id }}" style="color:#fff">{{ story.user_name }}</a>{% if story.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</h2>
+  <p class="muted">{{ story.created_at | fancy_time }}</p>
+  {% if story.kind == 'video' %}
+    <video src="{{ story.media }}" controls autoplay playsinline></video>
+  {% else %}
+    <img src="{{ story.media }}" alt="Story by {{ story.user_name }}">
+  {% endif %}
+  <p style="margin-top:1rem"><a href="/home">← Back home</a></p>
+</div>
+{% endblock %}

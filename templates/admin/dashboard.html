@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard — Post It{% endblock %}
+{% block wrap_class %} admin-wrap{% endblock %}
+{% block content %}
+<h1 class="page-title">🛠 Admin control room</h1>
+<div class="toolbar">
+  <a class="btn btn-ghost btn-small" href="/admin">Dashboard</a>
+  <a class="btn btn-ghost btn-small" href="/admin/users">Users</a>
+  <a class="btn btn-ghost btn-small" href="/admin/posts">Posts</a>
+  <a class="btn btn-ghost btn-small" href="/admin/reports">Reports</a>
+  <a class="btn btn-ghost btn-small" href="/admin/logout">Logout</a>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card"><div class="n">{{ stats.users }}</div><div class="l">Users</div></div>
+  <div class="stat-card"><div class="n">{{ stats.posts }}</div><div class="l">Posts</div></div>
+  <div class="stat-card"><div class="n">{{ stats.reports_open }}</div><div class="l">Open reports</div></div>
+  <div class="stat-card"><div class="n">{{ stats.listings }}</div><div class="l">Listings</div></div>
+</div>
+
+<h2>⚠️ Recent reports</h2>
+<table class="admin-table">
+  <thead><tr><th>ID</th><th>Reporter</th><th>Target</th><th>Reason</th><th>Status</th><th>At</th><th></th></tr></thead>
+  <tbody>
+  {% for r in recent_reports %}
+  <tr>
+    <td>{{ r.id }}</td>
+    <td>{{ r.reporter_name }}</td>
+    <td>{{ r.target_type }} #{{ r.target_id }}</td>
+    <td>{{ r.reason }}</td>
+    <td>{{ r.status }}</td>
+    <td>{{ r.created_at | fancy_time }}</td>
+    <td>
+      {% if r.status != 'resolved' %}
+      <form class="inline-form" action="/admin/reports/{{ r.id }}/resolve" method="POST">
+        <button type="submit" class="btn-small">Resolve</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="muted">No reports. All quiet on the western front. 🤫</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p><a href="/admin/reports">View all reports →</a></p>
+{% endblock %}

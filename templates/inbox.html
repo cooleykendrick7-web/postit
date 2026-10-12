@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Inbox — Post It{% endblock %}
+{% block content %}
+<h1 class="page-title">✉️ Inbox</h1>
+<div class="convo-list">
+  {% for c in convos %}
+  <a class="convo" href="/inbox/{{ c.other_id }}">
+    <span class="avatar avatar-md">
+      {% if c.other_avatar %}<img src="{{ c.other_avatar }}" alt="{{ c.other_name }}">
+      {% else %}<span class="initial">{{ c.other_name[0] }}</span>{% endif %}
+    </span>
+    <span class="grow">
+      <div><strong>{{ c.other_name }}</strong>{% if c.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+      <div class="preview">{{ c.last_body }}</div>
+      <div class="preview muted">{{ c.last_at }}</div>
+    </span>
+    {% if c.unread %}<span class="unread-n">{{ c.unread }}</span>{% endif %}
+  </a>
+  {% else %}
+  <div class="empty-state">
+    <span class="big">📭</span>
+    No conversations yet. Say hi to a friend!
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

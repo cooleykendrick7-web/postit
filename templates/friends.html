@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Friends — Post It{% endblock %}
+{% block content %}
+<h1 class="page-title">👥 Friends</h1>
+
+<h2>📥 Incoming requests</h2>
+{% for u in incoming %}
+<div class="user-row">
+  <a class="avatar avatar-md" href="/world/{{ u.id }}">
+    {% if u.avatar %}<img src="{{ u.avatar }}" alt="{{ u.name }}">{% else %}<span class="initial">{{ u.name[0] }}</span>{% endif %}
+  </a>
+  <div class="grow">
+    <div class="nm"><a href="/world/{{ u.id }}" style="color:#fff">{{ u.name }}</a>{% if u.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+  </div>
+  <form class="inline-form" action="/friends/accept/{{ u.id }}" method="POST"><button type="submit" class="btn-small">✅ Accept</button></form>
+  <form class="inline-form" action="/friends/decline/{{ u.id }}" method="POST"><button type="submit" class="btn-small btn-danger">✖️ Decline</button></form>
+</div>
+{% else %}
+<p class="muted">No incoming requests. 📭</p>
+{% endfor %}
+
+<h2>📤 Sent requests</h2>
+{% for u in sent %}
+<div class="user-row">
+  <a class="avatar avatar-md" href="/world/{{ u.id }}">
+    {% if u.avatar %}<img src="{{ u.avatar }}" alt="{{ u.name }}">{% else %}<span class="initial">{{ u.name[0] }}</span>{% endif %}
+  </a>
+  <div class="grow">
+    <div class="nm"><a href="/world/{{ u.id }}" style="color:#fff">{{ u.name }}</a>{% if u.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+    <div class="sub">⏳ Waiting on them…</div>
+  </div>
+</div>
+{% else %}
+<p class="muted">No sent requests. 📭</p>
+{% endfor %}
+
+<h2>✅ My friends</h2>
+{% for u in friends %}
+<div class="user-row">
+  <a class="avatar avatar-md" href="/world/{{ u.id }}">
+    {% if u.avatar %}<img src="{{ u.avatar }}" alt="{{ u.name }}">{% else %}<span class="initial">{{ u.name[0] }}</span>{% endif %}
+  </a>
+  <div class="grow">
+    <div class="nm"><a href="/world/{{ u.id }}" style="color:#fff">{{ u.name }}</a>{% if u.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+  </div>
+  <a class="btn btn-small btn-ghost" href="/inbox/{{ u.id }}">💬</a>
+  <form class="inline-form" action="/friends/remove/{{ u.id }}" method="POST" onsubmit="return confirm('Remove {{ u.name }}?');">
+    <button type="submit" class="btn-small btn-danger">Remove</button>
+  </form>
+</div>
+{% else %}
+<p class="muted">No friends yet — go find your people in <a href="/explore">Explore</a>! 🔍</p>
+{% endfor %}
+{% endblock %}

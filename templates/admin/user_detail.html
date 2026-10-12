@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}User {{ profile.id }} — Post It admin{% endblock %}
+{% block wrap_class %} admin-wrap{% endblock %}
+{% block content %}
+<h1 class="page-title">🛠 {{ profile.name }}{% if profile.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</h1>
+<div class="toolbar">
+  <a class="btn btn-ghost btn-small" href="/admin">Dashboard</a>
+  <a class="btn btn-ghost btn-small" href="/admin/users">Users</a>
+  <a class="btn btn-ghost btn-small" href="/admin/posts">Posts</a>
+  <a class="btn btn-ghost btn-small" href="/admin/reports">Reports</a>
+</div>
+
+<div class="card">
+  <p><strong>ID:</strong> {{ profile.id }} · <strong>Email:</strong> {{ profile.email }}</p>
+  <p><strong>World:</strong> {{ profile.world_title or '—' }}</p>
+  {% if profile.bio %}<p><strong>Bio:</strong> {{ profile.bio }}</p>{% endif %}
+  <div class="toolbar">
+    <form action="/admin/user/{{ profile.id }}/block" method="POST">
+      <button type="submit" class="btn-danger">🚫 Block user</button>
+    </form>
+    <form action="/admin/user/{{ profile.id }}/unblock" method="POST">
+      <button type="submit" class="btn-ghost">Unblock user</button>
+    </form>
+    <form action="/admin/user/{{ profile.id }}/delete" method="POST" onsubmit="return confirm('PERMANENTLY delete user {{ profile.id }}?');">
+      <button type="submit" class="btn-danger">🗑 Delete user</button>
+    </form>
+  </div>
+  <form action="/admin/user/{{ profile.id }}/message" method="POST" class="msg-form">
+    <input type="text" name="body" placeholder="Message as Post It Team…" required>
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<h2>📌 Their posts</h2>
+<div class="notes">
+  {% for post in posts %}
+    {% include "partials/post_card.html" %}
+  {% else %}
+  <p class="muted">No posts.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Verified — Post It{% endblock %}
+{% block content %}
+<h1 class="page-title">🌙⭐ Get Verified</h1>
+
+{% if enabled %}
+<div class="verified-panel">
+  <div class="big">🌙⭐</div>
+  <h2>Join the Verified club</h2>
+  <p><strong>$5/month</strong> gets you the <span class="verified-badge">🌙⭐</span> badge next to your name everywhere on Post It, plus a gold-tinted profile header that screams “I'm legit”.</p>
+  <form action="/verified/checkout" method="POST">
+    <button type="submit" style="font-size:1.1rem;padding:.8rem 2rem">Checkout — $5/month 💳</button>
+  </form>
+  <p class="hint">Secure checkout powered by Stripe. Cancel anytime.</p>
+</div>
+{% else %}
+<div class="verified-panel">
+  <div class="big">🌙⭐</div>
+  <h2>Verified is coming soon</h2>
+  <p>$5/month gets you the <span class="verified-badge">🌙⭐</span> badge next to your name everywhere, plus a gold-tinted profile header.</p>
+  <p class="muted">Checkout isn't wired up yet — check back soon! 🚧</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Post an ISO — Post It Market{% endblock %}
+{% block content %}
+<h1 class="page-title">🔎 Post an ISO</h1>
+<p class="muted">ISO = “In Search Of”. Tell the market what you're hunting for.</p>
+<form class="card" action="/market/iso/new" method="POST">
+  <div class="field">
+    <label for="title">What are you looking for?</label>
+    <input type="text" id="title" name="title" required maxlength="120" placeholder="e.g. PS5 controller, barely used">
+  </div>
+  <div class="field">
+    <label for="category">Category</label>
+    <select id="category" name="category" required>
+      {% for cat in categories %}
+      <option value="{{ cat }}">{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="max_price">Max price you'll pay ($) — optional</label>
+    <input type="number" id="max_price" name="max_price" min="0" step="0.01" placeholder="40.00">
+  </div>
+  <div class="field">
+    <label for="description">Details</label>
+    <textarea id="description" name="description" placeholder="Condition, color, pickup area…"></textarea>
+  </div>
+  <button type="submit">Post ISO 🎯</button>
+  <a class="btn btn-ghost" href="/market">Cancel</a>
+</form>
+{% endblock %}

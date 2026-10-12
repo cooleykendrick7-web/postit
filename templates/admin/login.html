@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Admin login — Post It{% endblock %}
+{% block content %}
+<div class="card auth-card">
+  <h1 class="center">🛠 Admin login</h1>
+  {% if error %}<p class="flash">{{ error }}</p>{% endif %}
+  <form action="/admin/login" method="POST">
+    <div class="field">
+      <label for="password">Admin password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit" style="width:100%">Enter the control room</button>
+  </form>
+</div>
+{% endblock %}

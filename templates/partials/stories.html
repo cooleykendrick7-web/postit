@@ -1,0 +1,18 @@
+{# Stories tray. Context: stories (list per contract). #}
+{% if stories %}
+<div class="stories-block">
+  <div class="stories-tray">
+    {% for s in stories %}
+    <div class="story-bubble">
+      <a href="/stories/{{ s.id }}">
+        <span class="story-avatar">
+          {% if s.avatar %}<img src="{{ s.avatar }}" alt="{{ s.user_name }}">
+          {% else %}<span class="initial">{{ s.user_name[0] }}</span>{% endif %}
+        </span>
+        <span class="story-name">{{ s.user_name }}{% if s.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</span>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

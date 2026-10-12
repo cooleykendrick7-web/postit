@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Chat with {{ other.name }} — Post It{% endblock %}
+{% block content %}
+<p><a href="/inbox">← Inbox</a></p>
+<h1 class="page-title">
+  <span class="avatar avatar-md">
+    {% if other.avatar %}<img src="{{ other.avatar }}" alt="{{ other.name }}">
+    {% else %}<span class="initial">{{ other.name[0] }}</span>{% endif %}
+  </span>
+  <a href="/world/{{ other.id }}" style="color:#fff">{{ other.name }}</a>{% if other.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}
+</h1>
+
+<div class="toolbar">
+  {% if blocked_by_me|default(false) %}
+  <form action="/unblock/{{ other.id }}" method="POST">
+    <button type="submit" class="btn-ghost">Unblock {{ other.name }}</button>
+  </form>
+  {% else %}
+  <form action="/block/{{ other.id }}" method="POST" onsubmit="return confirm('Block {{ other.name }}?');">
+    <button type="submit" class="btn-danger btn-small">🚫 Block</button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="thread">
+  {% for m in messages %}
+  <div class="msg {{ 'msg-mine' if m.mine else 'msg-theirs' }}">
+    {{ m.body }}
+    <div class="t">{{ m.created_at | fancy_time }}</div>
+  </div>
+  {% else %}
+  <div class="empty-state"><span class="big">💬</span>No messages yet — say what's up!</div>
+  {% endfor %}
+</div>
+
+<form class="msg-form" action="/inbox/{{ other.id }}" method="POST">
+  <input type="text" name="body" placeholder="Type a message…" required autocomplete="off">
+  <button type="submit">Send ➤</button>
+</form>
+{% endblock %}

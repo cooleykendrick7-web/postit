@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}New market group — Post It{% endblock %}
+{% block content %}
+<h1 class="page-title">👥 New market group</h1>
+<form class="card" action="/market/groups/new" method="POST">
+  <div class="field">
+    <label for="name">Group name</label>
+    <input type="text" id="name" name="name" required maxlength="80" placeholder="e.g. Sneakerheads Chicago">
+  </div>
+  <div class="field">
+    <label for="description">Description</label>
+    <textarea id="description" name="description" placeholder="What gets bought and sold here?"></textarea>
+  </div>
+  <button type="submit">Create group 🎉</button>
+  <a class="btn btn-ghost" href="/market">Cancel</a>
+</form>
+{% endblock %}

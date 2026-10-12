@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }} — Post It Market{% endblock %}
+{% block content %}
+<p><a href="/market">← Back to Market</a></p>
+<div class="card">
+  <h1 class="page-title">👥 {{ group.name }}</h1>
+  <p class="muted">{{ group.member_count }} members · started by {{ group.owner_name }}</p>
+  {% if group.description %}<p>{{ group.description }}</p>{% endif %}
+  {% if not is_member %}
+  <form action="/market/groups/{{ group.id }}/join" method="POST">
+    <button type="submit">Join group ➕</button>
+  </form>
+  {% else %}
+  <p class="muted">✅ You're a member!</p>
+  {% endif %}
+</div>
+
+<h2>💬 Group wall</h2>
+{% if is_member %}
+<form class="card" action="/market/groups/{{ group.id }}/post" method="POST">
+  <div class="field">
+    <label for="body">Post to the group</label>
+    <input type="text" id="body" name="body" required maxlength="500" placeholder="Selling something? Say it here…">
+  </div>
+  <button type="submit">Post</button>
+</form>
+{% endif %}
+
+<div class="convo-list">
+  {% for p in posts %}
+  <div class="convo" style="cursor:default">
+    <span class="avatar avatar-sm">
+      {% if p.avatar %}<img src="{{ p.avatar }}" alt="{{ p.user_name }}">
+      {% else %}<span class="initial">{{ p.user_name[0] }}</span>{% endif %}
+    </span>
+    <span class="grow">
+      <div><strong>{{ p.user_name }}</strong>{% if p.verified %}<span class="verified-badge">🌙⭐</span>{% endif %}</div>
+      <div>{{ p.body }}</div>
+      <div class="preview muted">{{ p.created_at | fancy_time }}</div>
+    </span>
+  </div>
+  {% else %}
+  <div class="empty-state"><span class="big">💬</span>No group posts yet — break the ice!</div>
+  {% endfor %}
+</div>
+{% endblock %}

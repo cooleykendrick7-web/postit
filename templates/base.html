@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Post It{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="{{ logo_url }}">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="{% if user %}/home{% else %}/login{% endif %}">
+      <img src="{{ logo_url }}" alt="Post It logo">
+      <span class="wordmark">Post It</span>
+    </a>
+    {% if user %}
+    <nav class="nav" aria-label="Main navigation">
+      <a href="/home">🏠 Home</a>
+      <a href="/explore">🧭 Explore</a>
+      <a href="/market">🛍 Market</a>
+      <a href="/inbox">✉️ Inbox{% if unread_count|default(0) > 0 %}<span class="unread-dot" aria-label="unread messages"></span>{% endif %}</a>
+      <a href="/friends">👥 Friends</a>
+      <a href="/verified">🌙⭐ Verified</a>
+      <a href="/world/{{ user.id }}">🌍 My World</a>
+      <a href="/search">🔍 Search</a>
+      <a href="/settings/profile">⚙️ Settings</a>
+      <a href="/logout">🚪 Logout</a>
+    </nav>
+    {% else %}
+    <nav class="nav" aria-label="Account">
+      <a href="/login">Log in</a>
+      <a href="/signup">Sign up</a>
+    </nav>
+    {% endif %}
+  </div>
+</header>
+
+{% if flash %}
+<div class="flash" role="alert">{{ flash }}</div>
+{% endif %}
+
+<main class="wrap{% block wrap_class %}{% endblock %}">
+{% block content %}{% endblock %}
+</main>
+
+<script src="/static/app.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
