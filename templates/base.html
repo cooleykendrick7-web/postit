@@ -20,7 +20,7 @@
       <a href="/explore">🧭 Explore</a>
       <a href="/market">🛍 Market</a>
       <a href="/inbox">✉️ Inbox{% if unread_count|default(0) > 0 %}<span class="unread-dot" aria-label="unread messages"></span>{% endif %}</a>
-      <a href="/friends">👥 Friends</a>
+      <a href="/friends">👥 Friends{% if pending_reqs|default(0) > 0 %}<span class="count-ball">{{ pending_reqs }}</span>{% endif %}</a>
       <a href="/verified">🌙⭐ Verified</a>
       <a href="/world/{{ user.id }}">🌍 My World</a>
       <a href="/search">🔍 Search</a>

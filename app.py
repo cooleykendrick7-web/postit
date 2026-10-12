@@ -271,10 +271,15 @@ def render(request, name, ctx=None):
         cnt = conn.execute(
             "SELECT COUNT(*) c FROM messages WHERE recipient_id=? AND read=0",
             (u["id"],)).fetchone()["c"]
+        pr = conn.execute(
+            "SELECT COUNT(*) c FROM friendships WHERE friend_id=? AND status='pending'",
+            (u["id"],)).fetchone()["c"]
         conn.close()
         ctx.setdefault("unread_count", cnt)
+        ctx.setdefault("pending_reqs", pr)
     else:
         ctx.setdefault("unread_count", 0)
+        ctx.setdefault("pending_reqs", 0)
     return templates.TemplateResponse(request, name, ctx)
 
 
@@ -833,12 +838,25 @@ def world(request: Request, uid: int):
         """SELECT COUNT(*) c FROM friendships
            WHERE (user_id=? OR friend_id=?) AND status='accepted'""",
         (uid, uid)).fetchone()["c"]
+    my_friends = []
+    if u["id"] != uid:
+        for f in conn.execute(
+                """SELECT users.id, users.name, users.avatar, users.verified
+                   FROM friendships
+                   JOIN users ON users.id = CASE WHEN friendships.user_id=?
+                         THEN friendships.friend_id ELSE friendships.user_id END
+                   WHERE (friendships.user_id=? OR friendships.friend_id=?)
+                   AND status='accepted' AND users.is_blocked=0
+                   AND users.id != ?""",
+                (u["id"], u["id"], u["id"], uid)):
+            my_friends.append(row_to_dict(f))
     conn.close()
     profile["friend_count"] = friend_count
     return render(request, "profile.html",
                   {"profile": profile, "posts": posts, "req_status": req_status,
                    "blocked_by_me": blocked_by_me,
-                   "is_owner": u["id"] == uid})
+                   "is_owner": u["id"] == uid,
+                   "my_friends": my_friends})
 
 
 @app.get("/settings/profile", response_class=HTMLResponse)
@@ -887,6 +905,36 @@ async def profile_edit(request: Request):
 
 
 # ---------------- friends ----------------
+@app.post("/world/{uid}/share")
+async def share_world(request: Request, uid: int):
+    u, err = require_login(request)
+    if err:
+        return err
+    form = await request.form()
+    try:
+        fid = int(form.get("friend_id") or 0)
+    except ValueError:
+        fid = 0
+    target = get_user(uid)
+    if not target or target["is_blocked"] or not fid or fid == uid:
+        return redir(f"/world/{uid}", "Couldn't share that world.")
+    conn = db()
+    ok = conn.execute(
+        """SELECT 1 FROM friendships
+           WHERE ((user_id=? AND friend_id=?) OR (user_id=? AND friend_id=?))
+           AND status='accepted'""",
+        (u["id"], fid, fid, u["id"])).fetchone()
+    if not ok or is_blocked_either(u["id"], fid):
+        conn.close()
+        return redir(f"/world/{uid}", "You can only share with your friends.")
+    conn.execute(
+        "INSERT INTO messages(sender_id, recipient_id, body, created_at) VALUES(?,?,?,?)",
+        (u["id"], fid,
+         f"🌍 {u['name']} shared a world with you: {target['name']}'s “{target['world_title']}” — /world/{uid}",
+         now_iso()))
+    conn.commit()
+    conn.close()
+    return redir(f"/world/{uid}", f"Shared {target['name']}'s world! 🌍")
 @app.get("/friends", response_class=HTMLResponse)
 def friends_page(request: Request):
     u, err = require_login(request)

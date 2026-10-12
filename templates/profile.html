@@ -45,6 +45,19 @@
     <form action="/block/{{ profile.id }}" method="POST" onsubmit="return confirm('Block {{ profile.name }}?');">
       <button type="submit" class="btn-danger">🚫 Block</button>
     </form>
+    {% if my_friends %}
+    <details class="share-world">
+      <summary class="btn btn-ghost">🔗 Share this world</summary>
+      <form action="/world/{{ profile.id }}/share" method="POST" class="inline-form">
+        <select name="friend_id" aria-label="Friend to share with">
+          {% for f in my_friends %}
+          <option value="{{ f.id }}">{{ f.name }}{% if f.verified %} 🌙⭐{% endif %}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Send</button>
+      </form>
+    </details>
+    {% endif %}
   {% endif %}
 </div>
 {% else %}

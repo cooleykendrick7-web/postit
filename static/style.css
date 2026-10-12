@@ -55,6 +55,12 @@ img{max-width:100%;height:auto;display:block}
   position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;
   background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.4s infinite}
 @keyframes pulse{50%{opacity:.4}}
+.count-ball{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:20px;height:20px;padding:0 6px;border-radius:999px;
+  background:var(--red);color:#fff;font-size:.72rem;font-weight:700;line-height:1;
+  box-shadow:0 0 8px var(--red);margin-left:6px;vertical-align:middle;
+  animation:pulse 1.4s infinite}
 
 /* ---------- layout ---------- */
 .wrap{max-width:720px;margin:0 auto;padding:1rem .8rem 4rem}
